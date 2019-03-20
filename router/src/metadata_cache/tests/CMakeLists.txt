@@ -47,7 +47,8 @@ SET(include_dirs
 # We do not link to the metadata cache libraries since the sources are
 # already built as part of the test libraries.
 IF(NOT WIN32)
-  ADD_LIBRARY(metadata_cache_tests SHARED ${METADATA_CACHE_TESTS_HELPER})
+    ADD_LIBRARY(metadata_cache_tests SHARED ${METADATA_CACHE_TESTS_HELPER})
+
   TARGET_LINK_LIBRARIES(metadata_cache_tests router_lib ${MySQL_CLIENT_LIB})
 ELSE()
   ADD_LIBRARY(metadata_cache_tests STATIC ${METADATA_CACHE_TESTS_HELPER})
