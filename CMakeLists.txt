@@ -831,6 +831,7 @@ IF(WITH_JEMALLOC AND (WITH_TCMALLOC OR WITH_TCMALLOC_DEBUG))
   MESSAGE(FATAL_ERROR "Specify only *one* of WITH_TCMALLOC and WITH_JEMALLOC")
 ENDIF()
 
+OPTION(FUZZING "Fuzzing" OFF)
 OPTION(ENABLED_PROFILING "Enable profiling" ON)
 OPTION(WITHOUT_SERVER OFF)
 
@@ -2440,6 +2441,10 @@ IF(NOT WITHOUT_SERVER AND WITH_UNIT_TESTS)
     TARGET_LINK_LIBRARIES(server_unittest_library ext::icu)
     TARGET_LINK_LIBRARIES(server_unittest_library binlog)
   ENDIF()
+ENDIF()
+
+IF (FUZZING)
+  ADD_SUBDIRECTORY(fuzz)
 ENDIF()
 
 # scripts/mysql_config depends on client and server targets loaded above.
