@@ -565,6 +565,7 @@ IF(WITH_JEMALLOC)
   STRING_APPEND(CMAKE_CXX_FLAGS " -fno-builtin-realloc -fno-builtin-free")
 ENDIF()
 
+OPTION(FUZZING "Fuzzing" OFF)
 OPTION(ENABLED_PROFILING "Enable profiling" ON)
 OPTION(WITHOUT_SERVER OFF)
 IF(UNIX)
@@ -1518,6 +1519,10 @@ IF(NOT WITHOUT_SERVER AND WITH_UNIT_TESTS)
   TARGET_LINK_LIBRARIES(server_unittest_library sql_main)
   TARGET_LINK_LIBRARIES(server_unittest_library minchassis)
   TARGET_LINK_LIBRARIES(server_unittest_library ${ICU_LIBRARIES})
+ENDIF()
+
+IF (FUZZING)
+  ADD_SUBDIRECTORY(fuzz)
 ENDIF()
 
 # scripts/mysql_config depends on client and server targets loaded above.
