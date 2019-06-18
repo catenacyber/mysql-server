@@ -60,7 +60,7 @@ bool vio_connect_fuzz(Vio *vio, struct sockaddr *addr, socklen_t len,
 
 int vio_socket_timeout_fuzz(Vio *vio, uint which, bool b) {
     DBUG_ENTER("vio_socket_timeout_fuzz\n");
-    return 1;
+    return 0;
 }
 
 
@@ -91,7 +91,7 @@ size_t vio_write_buff_fuzz(Vio *vio, const uchar *bufp, size_t size) {
 
 bool vio_is_connected_fuzz(Vio *vio) {
     DBUG_ENTER("vio_is_connected_fuzz\n");
-    return true;
+    return (fuzzPos < fuzzSize);
 }
 
 bool vio_was_timeout_fuzz(Vio *vio) {
@@ -116,4 +116,9 @@ int vio_io_wait_fuzz(Vio *vio, enum enum_vio_io_event event, int timeout) {
 int vio_fastsend_fuzz(Vio *vio) {
     DBUG_ENTER("vio_fastsend_fuzz\n");
     return 0;
+}
+
+bool vio_should_retry_fuzz(Vio *vio) {
+    DBUG_ENTER("vio_should_retry_fuzz\n");
+    return (fuzzPos < fuzzSize);
 }

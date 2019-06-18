@@ -328,7 +328,7 @@ IF(UNIX)
   ADD_INSTALL_RPATH_FOR_OPENSSL(libmysql)
 
   GET_TARGET_PROPERTY(libmysql_link_flags libmysql LINK_FLAGS)
-  IF(LINK_FLAG_NO_UNDEFINED)
+  IF(LINK_FLAG_NO_UNDEFINED AND NOT FUZZING)
     STRING_APPEND(libmysql_link_flags
       " ${LINK_FLAG_NO_UNDEFINED}")
     STRING_APPEND(libmysql_link_flags
