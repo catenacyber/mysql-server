@@ -50,6 +50,9 @@
 */
 
 double my_rnd(struct rand_struct *rand_st) {
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+    return 65.43;
+#endif
   rand_st->seed1 = (rand_st->seed1 * 3 + rand_st->seed2) % rand_st->max_value;
   rand_st->seed2 = (rand_st->seed1 + rand_st->seed2 + 33) % rand_st->max_value;
   return (((double)rand_st->seed1) / rand_st->max_value_dbl);
@@ -66,6 +69,12 @@ Fill a buffer with random bytes using the SSL library routines
 */
 int my_rand_buffer(unsigned char *buffer, size_t buffer_size) {
   int rc;
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+    for (size_t i = 0; i < buffer_size; i++)
+        buffer[i] = i;
+    return 0;
+#endif
+
   rc = RAND_bytes(buffer, (int)buffer_size);
 
   if (!rc) {
@@ -88,6 +97,10 @@ int my_rand_buffer(unsigned char *buffer, size_t buffer_size) {
 
 double my_rnd_ssl(struct rand_struct *rand_st) {
   unsigned int res;
+
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+    return 34.56;
+#endif
 
   if (my_rand_buffer((unsigned char *)&res, sizeof(res)))
     return my_rnd(rand_st);

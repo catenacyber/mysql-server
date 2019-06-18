@@ -318,7 +318,7 @@ IF(NOT DISABLE_SHARED)
     ENDIF()
 
     GET_TARGET_PROPERTY(libmysql_link_flags libmysql LINK_FLAGS)
-    IF(LINK_FLAG_NO_UNDEFINED)
+    IF(LINK_FLAG_NO_UNDEFINED AND NOT FUZZING)
       SET(libmysql_link_flags
         "${libmysql_link_flags} ${LINK_FLAG_NO_UNDEFINED}")
       SET(libmysql_link_flags

@@ -6300,7 +6300,9 @@ int mysqld_main(int argc, char **argv)
     unireg_abort(MYSQLD_ABORT_EXIT);  // Will do exit
   }
 
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
   my_init_signals();
+#endif
 
   size_t guardize = 0;
 #ifndef _WIN32
@@ -6781,8 +6783,10 @@ int mysqld_main(int argc, char **argv)
     unireg_abort(MYSQLD_ABORT_EXIT);
 
 #ifndef _WIN32
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
   //  Start signal handler thread.
   start_signal_handler();
+#endif
 #endif
 
   /* set all persistent options */
@@ -6955,6 +6959,10 @@ int mysqld_main(int argc, char **argv)
                "\n");
 
   (void)RUN_HOOK(server_state, before_handle_connection, (NULL));
+
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+  return 0;
+#endif
 
 #if defined(_WIN32)
   setup_conn_event_handler_threads();
@@ -9688,6 +9696,9 @@ static int get_options(int *argc_ptr, char ***argv_ptr) {
 
   if (opt_short_log_format) opt_specialflag |= SPECIAL_SHORT_LOG_FORMAT;
 
+#ifdef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
+  Connection_handler_manager::thread_handling = Connection_handler_manager::SCHEDULER_NO_THREADS;
+#endif
   if (Connection_handler_manager::init()) {
     LogErr(ERROR_LEVEL, ER_CONNECTION_HANDLING_OOM);
     return 1;
