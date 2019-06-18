@@ -460,5 +460,6 @@ int vio_shutdown_fuzz(Vio *vio);
 int vio_keepalive_fuzz(Vio *vio, bool set_keep_alive);
 int vio_io_wait_fuzz(Vio *vio, enum enum_vio_io_event event, int timeout);
 int vio_fastsend_fuzz(Vio *vio);
+bool vio_should_retry_fuzz(Vio *vio);
 
 #endif /* vio_violite_h_ */

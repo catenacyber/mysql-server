@@ -291,7 +291,7 @@ static bool vio_init(Vio *vio, enum enum_vio_type type, my_socket sd,
       vio->write = vio_write_buff_fuzz;
       vio->fastsend = vio_fastsend_fuzz;
       vio->viokeepalive = vio_keepalive_fuzz;
-      vio->should_retry = vio_should_retry;
+      vio->should_retry = vio_should_retry_fuzz;
       vio->was_timeout = vio_was_timeout_fuzz;
       vio->vioshutdown = vio_shutdown_fuzz;
       vio->peer_addr = vio_peer_addr;
