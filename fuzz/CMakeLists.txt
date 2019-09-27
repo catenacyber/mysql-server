@@ -1,6 +1,4 @@
-find_library(FUZZINGENGINE_LIB FuzzingEngine)
-
-if(NOT FUZZINGENGINE_LIB)
+if(NOT DEFINED ENV{LIB_FUZZING_ENGINE})
   MYSQL_ADD_EXECUTABLE(fuzz_real_query fuzz_real_query.cc onefile.cc)
   TARGET_LINK_LIBRARIES(fuzz_real_query mysqlclient)
 
@@ -12,13 +10,13 @@ if(NOT FUZZINGENGINE_LIB)
 else()
   MYSQL_ADD_EXECUTABLE(fuzz_real_query fuzz_real_query.cc)
   TARGET_LINK_LIBRARIES(fuzz_real_query mysqlclient)
-  TARGET_LINK_LIBRARIES(fuzz_real_query FuzzingEngine)
+  TARGET_LINK_LIBRARIES(fuzz_real_query $ENV{LIB_FUZZING_ENGINE})
 
   MYSQL_ADD_EXECUTABLE(fuzz_stmt_fetch fuzz_stmt_fetch.cc)
   TARGET_LINK_LIBRARIES(fuzz_stmt_fetch mysqlclient)
-  TARGET_LINK_LIBRARIES(fuzz_stmt_fetch FuzzingEngine)
+  TARGET_LINK_LIBRARIES(fuzz_stmt_fetch $ENV{LIB_FUZZING_ENGINE})
 
   MYSQL_ADD_EXECUTABLE(fuzz_mysqld fuzz_mysqld.cc)
   TARGET_LINK_LIBRARIES(fuzz_mysqld sql_main sql_gis binlog rpl master slave sql_main sql_dd sql_gis mysys mysys_ssl binlogevents_static ${ICU_LIBRARIES})
-  TARGET_LINK_LIBRARIES(fuzz_mysqld FuzzingEngine)
+  TARGET_LINK_LIBRARIES(fuzz_mysqld $ENV{LIB_FUZZING_ENGINE})
 endif()
