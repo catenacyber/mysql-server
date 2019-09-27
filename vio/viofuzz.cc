@@ -44,8 +44,7 @@ void sock_initfuzz(const uint8_t *Data, size_t Size) {
 
 bool vio_connect_fuzz(Vio *vio, struct sockaddr *addr, socklen_t len,
                         int timeout) {
-  int ret, wait;
-  int retry_count = 0;
+  int ret;
   DBUG_ENTER("vio_socket_connect");
 
   /* Only for socket-based transport types. */
@@ -73,8 +72,8 @@ size_t vio_read_buff_fuzz(Vio *vio, uchar *bufp, size_t size) {
         memcpy(bufp, fuzzBuffer + fuzzPos, size);
     }
     fuzzPos += size;
-    printf("net cli %d ", size);
-    for (int i=0; i<size; i++)
+    printf("net cli %zu ", size);
+    for (size_t i=0; i<size; i++)
         printf("%02x ", bufp[i]);
     printf("\n");
     return size;
@@ -82,8 +81,8 @@ size_t vio_read_buff_fuzz(Vio *vio, uchar *bufp, size_t size) {
 
 size_t vio_write_buff_fuzz(Vio *vio, const uchar *bufp, size_t size) {
     DBUG_ENTER("vio_write_buff_fuzz\n");
-    printf("net srv %d ", size);
-    for (int i=0; i<size; i++)
+    printf("net srv %zu ", size);
+    for (size_t i=0; i<size; i++)
         printf("%02x ", bufp[i]);
     printf("\n");
     return size;
