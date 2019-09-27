@@ -18,7 +18,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     MYSQL_RES     *prepare_meta_result;
     MYSQL_TIME    ts;
     unsigned long length[4];
-    int           param_count, column_count, row_count;
+    int           column_count;
     short         small_data;
     int           int_data;
     char          str_data[STRING_SIZE];
