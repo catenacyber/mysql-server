@@ -29,7 +29,7 @@ extern int mysqld_main(int argc, char **argv);
 char *filepath = NULL;
 
 extern "C" int LLVMFuzzerInitialize(const int* argc, char*** argv) {
-    filepath = dirname((*argv)[0]);
+    filepath = dirname(strdup((*argv)[0]));
     return 0;
 }
 

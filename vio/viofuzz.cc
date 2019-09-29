@@ -72,19 +72,23 @@ size_t vio_read_buff_fuzz(Vio *vio, uchar *bufp, size_t size) {
         memcpy(bufp, fuzzBuffer + fuzzPos, size);
     }
     fuzzPos += size;
+#ifdef FUZZ_DEBUG
     printf("net cli %zu ", size);
     for (size_t i=0; i<size; i++)
         printf("%02x ", bufp[i]);
     printf("\n");
+#endif //FUZZ_DEBUG
     return size;
 }
 
 size_t vio_write_buff_fuzz(Vio *vio, const uchar *bufp, size_t size) {
     DBUG_ENTER("vio_write_buff_fuzz\n");
+#ifdef FUZZ_DEBUG
     printf("net srv %zu ", size);
     for (size_t i=0; i<size; i++)
         printf("%02x ", bufp[i]);
     printf("\n");
+#endif //FUZZ_DEBUG
     return size;
 }
 
