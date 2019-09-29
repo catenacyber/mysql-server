@@ -24,8 +24,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
     char          str_data[STRING_SIZE];
     bool          is_null[4];
     bool          error[4];
+    bool opt_cleartext = true;
+    unsigned int opt_ssl = SSL_MODE_DISABLED;
 
     mysql_init(&mysql);
+    mysql_options(&mysql, MYSQL_ENABLE_CLEARTEXT_PLUGIN, &opt_cleartext);
+    mysql_options(&mysql, MYSQL_OPT_SSL_MODE, &opt_ssl);
     mysql.options.protocol = MYSQL_PROTOCOL_FUZZ;
     // The fuzzing takes place on network data received from server
     sock_initfuzz(Data,Size);
@@ -106,7 +110,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         mysql_close(&mysql);
         return 0;
     }
-    while (!mysql_stmt_fetch(stmt)) {}
+    while (1) {
+        int status = mysql_stmt_fetch(stmt);
+        if (status == 1 || status == MYSQL_NO_DATA)
+            break;
+    }
 
     mysql_free_result(prepare_meta_result);
     mysql_stmt_close(stmt);
