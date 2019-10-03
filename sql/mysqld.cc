@@ -7416,8 +7416,9 @@ int mysqld_main(int argc, char **argv)
   }
 
   start_handle_manager();
-
+#ifndef FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION
   create_compress_gtid_table_thread();
+#endif
 
   LogEvent()
       .type(LOG_TYPE_ERROR)

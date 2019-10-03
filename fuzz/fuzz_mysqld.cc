@@ -100,6 +100,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             0};
         int fakeargc = 12;
         mysqld_main(fakeargc, fakeargv);
+        //terminate_compress_gtid_table_thread();
 
         chm = Connection_handler_manager::get_instance();
         logfile = fopen("/dev/null", "w");

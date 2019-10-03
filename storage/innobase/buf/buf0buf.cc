@@ -1484,18 +1484,14 @@ dberr_t buf_pool_init(ulint total_size, ulint n_instances) {
       n = n_instances;
     }
 
-    std::vector<std::thread> threads;
-
     std::mutex m;
 
     for (ulint id = i; id < n; ++id) {
-      threads.emplace_back(std::thread(buf_pool_create, &buf_pool_ptr[id], size,
-                                       id, &m, std::ref(errs[id])));
+      buf_pool_create(&buf_pool_ptr[id], size,
+                                       id, &m, std::ref(errs[id]));
     }
 
     for (ulint id = i; id < n; ++id) {
-      threads[id - i].join();
-
       if (errs[id] != DB_SUCCESS) {
         err = errs[id];
       }
