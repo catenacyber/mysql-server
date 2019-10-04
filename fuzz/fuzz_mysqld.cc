@@ -18,13 +18,15 @@
 #include "sql/log.h"
 #include "sql/opt_costconstantcache.h"
 #include "sql/sql_plugin.h"
+#include "sql/sql_thd_internal_api.h"
+#include "sql/mysqld_thd_manager.h"
+#include "mysql/psi/mysql_socket.h"
 #include "violite.h"
 #include <stdlib.h>
 #include <libgen.h>
 
 using namespace std;
 FILE *logfile = NULL;
-Connection_handler_manager * chm;
 extern int mysqld_main(int argc, char **argv);
 char *filepath = NULL;
 
@@ -62,6 +64,50 @@ class Channel_info_fuzz : public Channel_info {
 
     virtual bool is_admin_connection() const { return m_is_admin_conn; }
 };
+
+static void try_connection(Channel_info *channel_info) {
+    if (my_thread_init()) {
+        channel_info->send_error_and_close_channel(ER_OUT_OF_RESOURCES, 0, false);
+        return;
+    }
+
+    THD *thd = channel_info->create_thd();
+    if (thd == NULL) {
+        channel_info->send_error_and_close_channel(ER_OUT_OF_RESOURCES, 0, false);
+        return;
+    }
+
+    thd->set_new_thread_id();
+
+    /*
+     handle_one_connection() is normally the only way a thread would
+     start and would always be on the very high end of the stack ,
+     therefore, the thread stack always starts at the address of the
+     first local variable of handle_one_connection, which is thd. We
+     need to know the start of the stack so that we could check for
+     stack overruns.
+     */
+    thd_set_thread_stack(thd, (char *)&thd);
+    thd->store_globals();
+
+    mysql_thread_set_psi_id(thd->thread_id());
+    mysql_socket_set_thread_owner(
+                                  thd->get_protocol_classic()->get_vio()->mysql_socket);
+
+    Global_THD_manager *thd_manager = Global_THD_manager::get_instance();
+    thd_manager->add_thd(thd);
+
+    if (!thd_prepare_connection(thd)) {
+        //authentication bypass
+        abort();
+    }
+    delete channel_info;
+    close_connection(thd, 0, false, false);
+    thd->release_resources();
+    thd_manager->remove_thd(thd);
+    delete thd;
+}
+
 
 #define MAX_SIZE 256
 
@@ -102,14 +148,13 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         mysqld_main(fakeargc, fakeargv);
         //terminate_compress_gtid_table_thread();
 
-        chm = Connection_handler_manager::get_instance();
         logfile = fopen("/dev/null", "w");
     }
     // The fuzzing takes place on network data received from client
     sock_initfuzz(Data,Size-1);
 
     Channel_info_fuzz *channel_info = new (std::nothrow) Channel_info_fuzz(Data[Size-1] & 0x80);
-    chm->process_new_connection(channel_info);
+    try_connection(channel_info);
 
     return 0;
 }
