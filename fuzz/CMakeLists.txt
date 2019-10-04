@@ -7,6 +7,10 @@ if(NOT DEFINED ENV{LIB_FUZZING_ENGINE})
 
   MYSQL_ADD_EXECUTABLE(fuzz_mysqld fuzz_mysqld.cc onefile.cc)
   TARGET_LINK_LIBRARIES(fuzz_mysqld sql_main sql_gis binlog rpl master slave sql_dd sql_gis mysys binlogevents_static ${ICU_LIBRARIES})
+
+  MYSQL_ADD_EXECUTABLE(fuzz_docommand fuzz_docommand.cc onefile.cc)
+  TARGET_LINK_LIBRARIES(fuzz_docommand sql_main sql_gis binlog rpl master slave sql_dd sql_gis mysys binlogevents_static ${ICU_LIBRARIES})
+
 else()
   MYSQL_ADD_EXECUTABLE(fuzz_real_query fuzz_real_query.cc)
   TARGET_LINK_LIBRARIES(fuzz_real_query mysqlclient)
@@ -19,4 +23,8 @@ else()
   MYSQL_ADD_EXECUTABLE(fuzz_mysqld fuzz_mysqld.cc)
   TARGET_LINK_LIBRARIES(fuzz_mysqld sql_main sql_gis binlog rpl master slave sql_dd sql_gis mysys binlogevents_static ${ICU_LIBRARIES})
   TARGET_LINK_LIBRARIES(fuzz_mysqld $ENV{LIB_FUZZING_ENGINE})
+
+  MYSQL_ADD_EXECUTABLE(fuzz_docommand fuzz_docommand.cc)
+  TARGET_LINK_LIBRARIES(fuzz_docommand sql_main sql_gis binlog rpl master slave sql_dd sql_gis mysys binlogevents_static ${ICU_LIBRARIES})
+  TARGET_LINK_LIBRARIES(fuzz_docommand $ENV{LIB_FUZZING_ENGINE})
 endif()
