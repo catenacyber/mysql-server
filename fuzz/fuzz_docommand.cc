@@ -107,7 +107,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
         snprintf(argbase, MAX_SIZE-1, "--basedir=%s/mysql/", filepath);
         snprintf(arginitfile, MAX_SIZE-1, "--init-file=%s/initnopw.sql", filepath);
 
-        char *fakeargv[] = {const_cast<char *>("fuzz_mysqld"),
+        char *fakeargv[] = {const_cast<char *>("fuzz_docommand"),
             const_cast<char *>("--user=root"),
             const_cast<char *>("--secure-file-priv=NULL"),
             const_cast<char *>("--log-error-verbosity=5"),
@@ -119,10 +119,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             const_cast<char *>("--performance_schema=OFF"),
             const_cast<char *>("--thread_stack=1048576"),
             const_cast<char *>("--datadir=/tmp/mysql/"),
+            const_cast<char *>("--PORT=3301"),
             const_cast<char *>(argbase),
             const_cast<char *>(arginitfile),
             0};
-        int fakeargc = 13;
+        int fakeargc = 14;
         mysqld_main(fakeargc, fakeargv);
 
         chm = Connection_handler_manager::get_instance();
