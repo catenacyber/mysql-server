@@ -61,20 +61,26 @@ static int bufferToFile(const char * name, const uint8_t *Data, size_t Size) {
 #define MAX_SIZE 256
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
+    if (Size < 1) {
+        return 0;
+    }
     if (logfile == NULL) {
-        my_progname = "fuzz_mysqld";
+        my_progname = "fuzz_initfile";
         /* first init was run with
          * mysqld --user=root --initialize-insecure --log-error-verbosity=5 --datadir=/out/mysql/data/ --basedir=/out/mysql/
          */
         system("rm -Rf /tmp/mysql");
         char command[MAX_SIZE];
         char argbase[MAX_SIZE];
+        char arginitfile[MAX_SIZE];
         snprintf(command, MAX_SIZE-1, "cp -r %s/mysql/data /tmp/mysql", filepath);
         //unsafe
         system(command);
 
         snprintf(argbase, MAX_SIZE-1, "--basedir=%s/mysql/", filepath);
-        char *fakeargv[] = {const_cast<char *>("fuzz_mysqld"),
+        snprintf(arginitfile, MAX_SIZE-1, "--init-file=%s/initnopw.sql", filepath);
+
+        char *fakeargv[] = {const_cast<char *>("fuzz_initfile"),
             const_cast<char *>("--user=root"),
             const_cast<char *>("--secure-file-priv=NULL"),
             const_cast<char *>("--log-error-verbosity=5"),
@@ -86,9 +92,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *Data, size_t Size) {
             const_cast<char *>("--performance_schema=OFF"),
             const_cast<char *>("--thread_stack=1048576"),
             const_cast<char *>("--datadir=/tmp/mysql/"),
+            const_cast<char *>("--PORT=3302"),
             const_cast<char *>(argbase),
+            const_cast<char *>(arginitfile),
             0};
-        int fakeargc = 12;
+        int fakeargc = 14;
         mysqld_main(fakeargc, fakeargv);
         //terminate_compress_gtid_table_thread();
 
