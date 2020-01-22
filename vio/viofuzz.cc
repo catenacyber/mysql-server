@@ -44,13 +44,10 @@ void sock_initfuzz(const uint8_t *Data, size_t Size) {
 
 bool vio_connect_fuzz(Vio *vio, struct sockaddr *addr, socklen_t len,
                         int timeout) {
-  int ret;
   DBUG_ENTER("vio_socket_connect");
 
   /* Initiate the connection. */
-  ret=0;
-
-  DBUG_RETURN(MY_TEST(ret));
+  return 0;
 }
 
 
