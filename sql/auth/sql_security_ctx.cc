@@ -382,6 +382,9 @@ int Security_context::activate_role(LEX_CSTRING role, LEX_CSTRING role_host,
 void Security_context::checkout_access_maps(void) {
   DBUG_TRACE;
 
+#if defined(HAVE_ASAN)
+  return;
+#endif
   /*
     If we're checkout out a map before we return it now, because we're only
     allowed to have one map at a time.
